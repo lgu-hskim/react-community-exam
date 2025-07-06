@@ -74,7 +74,7 @@ function PostListPage() {
                     {post.title}
                   </a>
                 </td>
-                <td>{post.users.email}</td>
+                <td>{post.users?.email || "알 수 없음"}</td>
                 <td>{post.created_at.split("T")[0]}</td>
               </tr>
             ))}
