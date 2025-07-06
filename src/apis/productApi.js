@@ -1,6 +1,6 @@
 import { supabase } from "../libs/supabase";
 
-export const fetchPosts = async (page = 1, limit = 20) => {
+export const fetchProducts = async (page = 1, limit = 20) => {
   const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
   const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -13,12 +13,12 @@ export const fetchPosts = async (page = 1, limit = 20) => {
   const offset = (page - 1) * limit;
 
   const { data, count, error } = await supabase
-    .from("posts")
+    .from("products")
     .select(
       `
-      id, title, content, created_at,
-      users(email)
-    `
+      id, title, description, price, image
+    `,
+      { count: "exact" }
     )
     .order("id", { ascending: false })
     .range(offset, offset + limit - 1);
@@ -26,10 +26,9 @@ export const fetchPosts = async (page = 1, limit = 20) => {
   if (error) {
     throw new Error(error.message);
   }
-  console.log(data, count);
 
   return {
-    posts: data ?? [],
+    products: data ?? [],
     totalCount: count ?? 0,
   };
 };
