@@ -21,6 +21,9 @@ function Header() {
           <li>
             <Link to="/products">상품</Link>
           </li>
+          <li>
+            <Link to="/carts">장바구니</Link>
+          </li>
           {!user && (
             <>
               <li>

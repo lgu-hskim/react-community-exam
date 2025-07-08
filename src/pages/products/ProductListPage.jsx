@@ -46,6 +46,34 @@ function ProductListPage() {
     return p.toLocaleString("ko-KR");
   };
 
+  const handleAddCard = (product) => {
+    // localStorage에서 cart 가져오기
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+    // 이미 담긴 상품인지 확인
+    const existing = cart.find((item) => item.id === product.id);
+
+    if (existing) {
+      // 이미 있으면 수량 증가
+      existing.quantity += 1;
+    } else {
+      // 없으면 새로 추가
+      cart.push({ ...product, quantity: 1 });
+    }
+
+    // localStorage에 저장
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    // 장바구니 전체 수량 계산
+    const totalQuantity = cart.reduce(
+      (sum, item) => sum + (item.quantity || 1),
+      0
+    );
+
+    // 사용자 피드백 (수량 포함)
+    alert(`장바구니에 담겼습니다! (총 수량: ${totalQuantity})`);
+  };
+
   if (isLoading) {
     return <div className="p-8 text-center">로딩 중...</div>;
   }
@@ -87,7 +115,12 @@ function ProductListPage() {
                 {formatPrice(product.price)} 원
               </div>
               <div className="card-actions justify-end mt-4">
-                <button className="btn btn-primary btn-sm">상세보기</button>
+                <button
+                  onClick={() => handleAddCard(product)}
+                  className="btn btn-primary btn-sm"
+                >
+                  장바구니
+                </button>
               </div>
             </div>
           </div>
