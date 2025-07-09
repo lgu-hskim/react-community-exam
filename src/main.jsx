@@ -9,6 +9,8 @@ import ErrorPage from "./pages/ErrorPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import SignupPage from "./pages/SignupPage.jsx";
+import ProductListPage from "./pages/products/ProductListPage.jsx";
+import CartListPage from "./pages/carts/CartListPage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -18,6 +20,14 @@ const router = createBrowserRouter([
       {
         path: "posts",
         element: <PostListPage />,
+      },
+      {
+        path: "products",
+        element: <ProductListPage />,
+      },
+      {
+        path: "carts",
+        element: <CartListPage />,
       },
       {
         path: "write",
