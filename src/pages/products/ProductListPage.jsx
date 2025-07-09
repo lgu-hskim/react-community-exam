@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { fetchProducts } from "../../apis/productApi";
 import Pagination from "../../components/Pagination";
 import { Link } from "react-router-dom";
+import { useCartStore } from "../../stores/cartStore";
+import { useUserStore } from "../../stores/userStore";
+import { insertCarts } from "../../apis/cartApi";
 
 function ProductListPage() {
   const [products, setProducts] = useState([]);
@@ -46,33 +49,48 @@ function ProductListPage() {
     return p.toLocaleString("ko-KR");
   };
 
-  const handleAddCard = (product) => {
-    // localStorage에서 cart 가져오기
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+  // 컴포넌트 최상위에서 user를 가져옴
+  const user = useUserStore((s) => s.user);
 
-    // 이미 담긴 상품인지 확인
-    const existing = cart.find((item) => item.id === product.id);
+  const handleAddCart = (product) => {
+    const userId = user.id;
+    const productId = product.id;
 
-    if (existing) {
-      // 이미 있으면 수량 증가
-      existing.quantity += 1;
-    } else {
-      // 없으면 새로 추가
-      cart.push({ ...product, quantity: 1 });
+    const insertResult = insertCarts(userId, productId);
+    if (insertResult) {
+      alert(`장바구니에 ${product.title} 상품이 담겼습니다!`);
     }
-
-    // localStorage에 저장
-    localStorage.setItem("cart", JSON.stringify(cart));
-
-    // 장바구니 전체 수량 계산
-    const totalQuantity = cart.reduce(
-      (sum, item) => sum + (item.quantity || 1),
-      0
-    );
-
-    // 사용자 피드백 (수량 포함)
-    alert(`장바구니에 담겼습니다! (총 수량: ${totalQuantity})`);
   };
+
+  // const handleAddCard = (product) => {
+  //   // localStorage에서 cart 가져오기
+  //   // const cart = useCartStore((s) => s.cart);
+  //   const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+  //   // 이미 담긴 상품인지 확인
+  //   const existing = cart.find((item) => item.id === product.id);
+
+  //   if (existing) {
+  //     // 이미 있으면 수량 증가
+  //     existing.quantity += 1;
+  //   } else {
+  //     // 없으면 새로 추가
+  //     // useCartStore.getState().addCart({ ...product, quantity: 1 });
+  //     cart.push({ ...product, quantity: 1 });
+  //   }
+
+  //   // localStorage에 저장
+  //   localStorage.setItem("cart", JSON.stringify(cart));
+
+  //   // 장바구니 전체 수량 계산
+  //   const totalQuantity = cart.reduce(
+  //     (sum, item) => sum + (item.quantity || 1),
+  //     0
+  //   );
+
+  //   // 사용자 피드백 (수량 포함)
+  //   alert(`장바구니에 담겼습니다! (총 수량: ${totalQuantity})`);
+  // };
 
   if (isLoading) {
     return <div className="p-8 text-center">로딩 중...</div>;
@@ -116,7 +134,7 @@ function ProductListPage() {
               </div>
               <div className="card-actions justify-end mt-4">
                 <button
-                  onClick={() => handleAddCard(product)}
+                  onClick={() => handleAddCart(product)}
                   className="btn btn-primary btn-sm"
                 >
                   장바구니
