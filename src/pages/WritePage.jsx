@@ -2,6 +2,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate } from "react-router-dom";
+import { fetchWrite } from "../apis/writeApi";
+import { useUserStore } from "../stores/userStore";
 
 // 1. Zod로 유효성 검사 스키마 정의
 const postSchema = z.object({
@@ -12,6 +14,7 @@ const postSchema = z.object({
 
 function WritePage() {
   const navigate = useNavigate();
+  const user = useUserStore((s) => s.user);
 
   // 2. useForm 훅으로 폼 상태 및 함수 가져오기
   const {
@@ -25,16 +28,13 @@ function WritePage() {
   // 3. 폼 제출 시 실행될 함수 정의 (유효성 검사 통과 후)
   const onSubmit = async (data) => {
     try {
-      const response = await fetch("/posts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        // 폼 데이터를 JSON 문자열로 변환하여 body에 담아 전송
-        body: JSON.stringify(data),
+      const response = await fetchWrite({
+        title: data.title,
+        content: data.content,
+        user_id: user.id,
       });
 
-      if (!response.ok) {
+      if (response.error) {
         throw new Error("서버에서 게시물 생성에 실패했습니다.");
       }
 

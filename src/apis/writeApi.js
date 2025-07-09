@@ -1,6 +1,6 @@
 import { supabase } from "../libs/supabase";
 
-export const fetchPosts = async (page = 1, limit = 20) => {
+export const fetchWrite = async (data) => {
   const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
   const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -10,26 +10,21 @@ export const fetchPosts = async (page = 1, limit = 20) => {
     );
   }
 
-  const offset = (page - 1) * limit;
-
-  const { data, count, error } = await supabase
+  const { error } = await supabase
     .from("posts")
-    .select(
-      `
-      id, title, content, created_at,
-      user_id,
-      users!posts_user_id_fkey(id, email)
-    `
-    )
-    .order("id", { ascending: false })
-    .range(offset, offset + limit - 1);
+    .insert({
+      title: data.title,
+      content: data.content,
+      user_id: data.user_id,
+      created_at: new Date().toISOString(), // 현재 시간 추가
+    })
+    .select();
 
   if (error) {
     throw new Error(error.message);
   }
 
   return {
-    posts: data ?? [],
-    totalCount: count ?? 0,
+    error,
   };
 };
